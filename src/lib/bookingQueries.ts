@@ -23,16 +23,17 @@ export async function fetchBookings() {
 export async function saveBooking(productId: number, bookingDate: string) {
     const { data, error } = await supabase.from('bookings').insert([
         {
-            product_id: productId, // Product ID related to the booking
-            booking_date: bookingDate, // Date selected for the booking
+            product_id: productId,
+            booking_date: bookingDate,
         },
     ]);
 
     if (error) {
-        console.error('Error saving booking:', error.message); // Log the error for debugging
-        throw new Error('Failed to save booking'); // Throw an error to indicate failure
+        console.error('Error saving booking:', error.message);
+        throw new Error('Failed to save booking');
     }
 
-    console.log('Booking saved:', data); // Log the saved booking for debugging
-    return data; // Return the saved data (optional, based on usage)
+    console.log('Booking saved:', data);
+    return data;
 }
+

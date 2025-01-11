@@ -3,6 +3,7 @@ import Gallery from "@/components/product/gallery";
 import { ProductProvider } from "@/components/product/product-context";
 import { ProductDescription } from "@/components/product/product-description";
 import BookingCalendar from "@/components/calendar/BookingCalendar";
+import { AddToCart } from "@/components/cart/add-to-cart"; // Ensure correct import
 import { HIDDEN_PRODUCT_TAG } from "@/lib/constants";
 import { getProduct, getProductRecommendations } from "@/lib/shopify";
 import { Image } from "@/lib/shopify/types";
@@ -61,7 +62,7 @@ export default async function ProductPage({
         <ProductProvider>
             <div className="mx-auto max-w-screen-2xl px-4">
                 <div className="flex flex-col lg:flex-row gap-8 rounded-lg border border-neutral-200 bg-white p-8 md:p-12 dark:border-neutral-800 dark:bg-black">
-                    {/* Left Section: Gallery and Description */}
+                    {/* Left Section: Gallery and Calendar */}
                     <div className="w-full lg:w-2/3 flex flex-col gap-8">
                         {/* Gallery */}
                         <Suspense
@@ -77,19 +78,23 @@ export default async function ProductPage({
                             />
                         </Suspense>
 
-                        {/* Product Description */}
-                        <div>
-                            <Suspense fallback={null}>
-                                <ProductDescription product={product} />
-                            </Suspense>
+                        {/* Booking Calendar */}
+                        <div className="rounded-lg border border-neutral-200 p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mt-6">
+                            <BookingCalendar productId={product.id} />
                         </div>
                     </div>
 
-                    {/* Right Section: Title, Price, and Calendar */}
-                    <div className="w-full lg:w-1/3 flex flex-col gap-6">
-                        {/* Booking Calendar */}
-                        <div className="rounded-lg border border-neutral-200 p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
-                            <BookingCalendar productId={product.id} />
+                    {/* Right Section: Description and Add to Cart */}
+                    <div className="w-full lg:w-1/3 flex flex-col items-center justify-center text-center">
+                        <div className="prose max-w-none">
+                            <h2 style={{ fontSize: "2rem", fontWeight: "bold" }}>
+                                {product.title}
+                            </h2>
+                            <p style={{ marginTop: "10px" }}>{product.description}</p>
+                        </div>
+                        {/* AddToCart Component */}
+                        <div className="mt-6 w-full">
+                            <AddToCart product={product} />
                         </div>
                     </div>
                 </div>

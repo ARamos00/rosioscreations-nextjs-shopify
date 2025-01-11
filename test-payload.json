@@ -3,15 +3,11 @@
   "line_items": [
     {
       "product_id": 8194931753113,
-      "properties": [
-        { "name": "Booking Date", "value": "2025-01-15" }
-      ]
+      "properties": [{ "name": "Booking Date", "value": "2025-01-15" }]
     },
     {
       "product_id": 8194941190297,
-      "properties": [
-        { "name": "Booking Date", "value": "2025-01-16" }
-      ]
+      "properties": [{ "name": "Booking Date", "value": "2025-01-16" }]
     }
   ]
 }
