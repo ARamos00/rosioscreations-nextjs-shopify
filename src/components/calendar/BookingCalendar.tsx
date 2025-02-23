@@ -32,8 +32,8 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({ product }) => {
     } else {
         return (
             <div>
-                No booking type defined. Please set the{" "}
-                <code>eventOrServiceChoice</code> metafield to "Service" or "Event Rental".
+                No booking type defined. Please set the <code>eventOrServiceChoice</code>{" "}
+                metafield to &quot;Service&quot; or &quot;Event Rental&quot;.
             </div>
         );
     }
