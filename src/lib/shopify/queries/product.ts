@@ -1,20 +1,18 @@
-import { productFragment } from "../fragments/product";
+import { productWithBookableFragment } from "@/lib/shopify/fragments/productWithBookable";
+import { productFragment } from "@/lib/shopify/fragments/product";
 
 export const getProductQuery = /* GraphQL */ `
   query getProduct($handle: String!) {
     product(handle: $handle) {
-      ...product
+      ...productWithBookable
     }
   }
-  ${productFragment}
+  ${productWithBookableFragment}
 `;
 
+
 export const getProductsQuery = /* GraphQL */ `
-  query getProducts(
-    $sortKey: ProductSortKeys
-    $reverse: Boolean
-    $query: String
-  ) {
+  query getProducts($sortKey: ProductSortKeys, $reverse: Boolean, $query: String) {
     products(sortKey: $sortKey, reverse: $reverse, query: $query, first: 100) {
       edges {
         node {

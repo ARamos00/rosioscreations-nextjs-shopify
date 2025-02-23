@@ -36,3 +36,8 @@ button {
   font-size: 1rem;
   color: #333;
 }
+
+.react-calendar__tile.booked {
+  background-color: #ccc !important;
+  color: #888;
+}

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
+import { BookingDateProvider } from "@/components/calendar/bookingDateContext";
 import { cookies } from "next/headers";
 import { getCart } from "@/lib/shopify";
 
@@ -15,21 +16,23 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  children,
-}: Readonly<{
+                                           children,
+                                         }: Readonly<{
   children: React.ReactNode;
 }>) {
   const cartId = cookies().get("cartId")?.value;
   const cart = getCart(cartId);
   return (
-    <html lang="en">
+      <html lang="en">
       <body className={inter.className}>
+      <BookingDateProvider>
         <CartProvider cartPromise={cart}>
           <Navbar />
           {children}
           <Footer />
         </CartProvider>
+      </BookingDateProvider>
       </body>
-    </html>
+      </html>
   );
 }

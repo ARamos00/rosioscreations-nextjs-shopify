@@ -1,5 +1,6 @@
 import { productFragment } from "./product";
 
+
 const cartFragment = /* GraphQL */ `
   fragment cart on Cart {
     id
