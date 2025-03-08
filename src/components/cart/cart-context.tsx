@@ -8,17 +8,28 @@ type UpdateType = "plus" | "minus" | "delete";
 type CartContextType = {
   cart: Cart | undefined;
   updateCartItem: (merchandiseId: string, updateType: UpdateType) => void;
-  addCartItem: (variant: ProductVariant, product: Product) => void;
+  addCartItem: (
+      variant: ProductVariant,
+      product: Product,
+      bookingDate?: Date | null,
+      bookingType?: string | null
+  ) => void;
 };
+
 type CartAction =
-  | {
-      type: "UPDATE_ITEM";
-      payload: { merchandiseId: string; updateType: UpdateType };
-    }
-  | {
-      type: "ADD_ITEM";
-      payload: { variant: ProductVariant; product: Product };
-    };
+    | {
+  type: "UPDATE_ITEM";
+  payload: { merchandiseId: string; updateType: UpdateType };
+}
+    | {
+  type: "ADD_ITEM";
+  payload: {
+    variant: ProductVariant;
+    product: Product;
+    bookingDate?: Date | null;
+    bookingType?: string | null;
+  };
+};
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -41,20 +52,21 @@ function calculateItemCost(quantity: number, price: string): string {
 }
 
 function updateCartItem(
-  item: CartItem,
-  updateType: UpdateType
+    item: CartItem,
+    updateType: UpdateType
 ): CartItem | null {
   if (updateType === "delete") return null;
 
   const newQuantity =
-    updateType === "plus" ? item.quantity + 1 : item.quantity - 1;
+      updateType === "plus" ? item.quantity + 1 : item.quantity - 1;
 
   if (newQuantity === 0) return null;
 
-  const singleItemAmount = Number(item.cost.totalAmount.amount) / item.quantity;
+  const singleItemAmount =
+      Number(item.cost.totalAmount.amount) / item.quantity;
   const newTotalAmount = calculateItemCost(
-    newQuantity,
-    singleItemAmount.toString()
+      newQuantity,
+      singleItemAmount.toString()
   );
 
   return {
@@ -67,16 +79,19 @@ function updateCartItem(
         amount: newTotalAmount,
       },
     },
+    // Preserve the existing bookingDate and bookingType when updating an item
+    bookingDate: (item as any).bookingDate ?? null,
+    bookingType: (item as any).bookingType ?? null,
   };
 }
 
 function updateCartTotals(
-  lines: CartItem[]
+    lines: CartItem[]
 ): Pick<Cart, "totalQuantity" | "cost"> {
   const totalQuantity = lines.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = lines.reduce(
-    (sum, item) => sum + Number(item.cost.totalAmount.amount),
-    0
+      (sum, item) => sum + Number(item.cost.totalAmount.amount),
+      0
   );
 
   const currencyCode = lines[0]?.cost.totalAmount.currencyCode ?? "USD";
@@ -92,9 +107,11 @@ function updateCartTotals(
 }
 
 function createOrUpdateCartItem(
-  existingItem: CartItem | undefined,
-  variant: ProductVariant,
-  product: Product
+    existingItem: CartItem | undefined,
+    variant: ProductVariant,
+    product: Product,
+    bookingDate?: Date | null,
+    bookingType?: string | null
 ): CartItem {
   const quantity = existingItem ? existingItem.quantity + 1 : 1;
   const totalAmount = calculateItemCost(quantity, variant.price.amount);
@@ -119,6 +136,12 @@ function createOrUpdateCartItem(
         featuredImage: product.featuredImage,
       },
     },
+    // Set the bookingDate and bookingType if provided;
+    // if updating, preserve the existing values.
+    bookingDate:
+        bookingDate || (existingItem && (existingItem as any).bookingDate) || null,
+    bookingType:
+        bookingType || (existingItem && (existingItem as any).bookingType) || null,
   };
 }
 
@@ -129,12 +152,12 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
     case "UPDATE_ITEM": {
       const { merchandiseId, updateType } = action.payload;
       const updatedLines = currentCart.lines
-        .map((item) =>
-          item.merchandise.id === merchandiseId
-            ? updateCartItem(item, updateType)
-            : item
-        )
-        .filter(Boolean) as CartItem[];
+          .map((item) =>
+              item.merchandise.id === merchandiseId
+                  ? updateCartItem(item, updateType)
+                  : item
+          )
+          .filter(Boolean) as CartItem[];
 
       if (updatedLines.length === 0) {
         return {
@@ -155,21 +178,23 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
       };
     }
     case "ADD_ITEM": {
-      const { variant, product } = action.payload;
+      const { variant, product, bookingDate, bookingType } = action.payload;
       const existingItem = currentCart.lines.find(
-        (item) => item.merchandise.id === variant.id
+          (item) => item.merchandise.id === variant.id
       );
       const updatedItem = createOrUpdateCartItem(
-        existingItem,
-        variant,
-        product
+          existingItem,
+          variant,
+          product,
+          bookingDate,
+          bookingType
       );
 
       const updatedLines = existingItem
-        ? currentCart.lines.map((item) =>
-            item.merchandise.id === variant.id ? updatedItem : item
+          ? currentCart.lines.map((item) =>
+              item.merchandise.id === variant.id ? updatedItem : item
           )
-        : [...currentCart.lines, updatedItem];
+          : [...currentCart.lines, updatedItem];
 
       return {
         ...currentCart,
@@ -183,16 +208,16 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
 }
 
 export function CartProvider({
-  children,
-  cartPromise,
-}: {
+                               children,
+                               cartPromise,
+                             }: {
   children: React.ReactNode;
   cartPromise: Promise<Cart | undefined>;
 }) {
   const initialCart = use(cartPromise);
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
-    initialCart,
-    cartReducer
+      initialCart,
+      cartReducer
   );
 
   const updateCartItem = (merchandiseId: string, updateType: UpdateType) => {
@@ -202,17 +227,25 @@ export function CartProvider({
     });
   };
 
-  const addCartItem = (variant: ProductVariant, product: Product) => {
-    updateOptimisticCart({ type: "ADD_ITEM", payload: { variant, product } });
+  const addCartItem = (
+      variant: ProductVariant,
+      product: Product,
+      bookingDate?: Date | null,
+      bookingType?: string | null
+  ) => {
+    updateOptimisticCart({
+      type: "ADD_ITEM",
+      payload: { variant, product, bookingDate, bookingType },
+    });
   };
 
   const value = useMemo(
-    () => ({
-      cart: optimisticCart,
-      updateCartItem,
-      addCartItem,
-    }),
-    [optimisticCart]
+      () => ({
+        cart: optimisticCart,
+        updateCartItem,
+        addCartItem,
+      }),
+      [optimisticCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

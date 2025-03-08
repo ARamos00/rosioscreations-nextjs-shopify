@@ -13,18 +13,33 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function addItem(
-  prevState: any,
-  selectedVariantId: string | undefined
+    prevState: any,
+    data: { selectedVariantId: string | undefined; bookingDate?: string; bookingType?: string }
 ) {
   let cartId = cookies().get("cartId")?.value;
-
-  if (!cartId || !selectedVariantId) {
+  if (!cartId || !data.selectedVariantId) {
     return "Error adding item to cart";
   }
 
   try {
+    console.log("Server addItem: bookingDate is", data.bookingDate);
+    console.log("Server addItem: bookingType is", data.bookingType);
+
+    // Build attributes array conditionally.
+    const attributes = [];
+    if (data.bookingDate) {
+      attributes.push({ key: "bookingDate", value: data.bookingDate });
+    }
+    if (data.bookingType) {
+      attributes.push({ key: "bookingType", value: data.bookingType });
+    }
+
     await addToCart(cartId, [
-      { merchandiseId: selectedVariantId, quantity: 1 },
+      {
+        merchandiseId: data.selectedVariantId,
+        quantity: 1,
+        attributes,
+      },
     ]);
     revalidateTag(TAGS.cart);
   } catch (error) {
@@ -33,11 +48,11 @@ export async function addItem(
 }
 
 export async function updateItemQuantity(
-  prevState: any,
-  payload: {
-    merchandiseId: string;
-    quantity: number;
-  }
+    prevState: any,
+    payload: {
+      merchandiseId: string;
+      quantity: number;
+    }
 ) {
   let cartId = cookies().get("cartId")?.value;
   if (!cartId) {
@@ -53,7 +68,7 @@ export async function updateItemQuantity(
     }
 
     const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
+        (line) => line.merchandise.id === merchandiseId
     );
 
     if (lineItem && lineItem.id) {
@@ -94,7 +109,7 @@ export async function removeItem(prevState: any, merchandiseId: string) {
     }
 
     const lineItem = cart.lines.find(
-      (line) => line.merchandise.id === merchandiseId
+        (line) => line.merchandise.id === merchandiseId
     );
 
     if (lineItem && lineItem.id) {

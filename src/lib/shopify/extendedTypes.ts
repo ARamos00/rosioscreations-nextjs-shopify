@@ -1,5 +1,4 @@
-// In a types file (e.g. src/lib/shopify/extendedTypes.ts)
-import { Product } from "@/lib/shopify/types";
+import { Product, CartItem } from "@/lib/shopify/types";
 
 export interface Metafield {
     id: string;
@@ -14,3 +13,5 @@ export interface ExtendedProduct extends Product {
     bookableMetafield?: Metafield | null;
     eventOrServiceChoice?: Metafield | null;
 }
+
+

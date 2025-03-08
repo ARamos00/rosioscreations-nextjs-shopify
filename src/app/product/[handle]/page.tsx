@@ -113,7 +113,7 @@ export default async function ProductPage({
                         <div className="basis-full lg:basis-2/6">
                             <Suspense fallback={null}>
                                 <ProductDescription product={product} />
-                                <BookableIndicator product={extendedProduct} />
+                                {/*<BookableIndicator product={extendedProduct} />*/}
                             </Suspense>
                         </div>
                     </div>

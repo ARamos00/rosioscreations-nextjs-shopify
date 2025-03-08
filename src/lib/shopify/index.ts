@@ -392,8 +392,12 @@ export async function updateCart(
 }
 
 export async function addToCart(
-  cartId: string,
-  lines: { merchandiseId: string; quantity: number }[]
+    cartId: string,
+    lines: {
+      merchandiseId: string;
+      quantity: number;
+      attributes?: { key: string; value: string }[];
+    }[]
 ): Promise<Cart> {
   const res = await shopifyFetch<ShopifyAddToCartOperation>({
     query: addToCartMutation,
@@ -406,6 +410,8 @@ export async function addToCart(
 
   return reshapeCart(res.body.data.cartLinesAdd.cart);
 }
+
+
 
 // This is called from `app/api/revalidate.ts` so providers can control revalidation logic.
 export async function revalidate(req: NextRequest): Promise<NextResponse> {

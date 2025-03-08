@@ -58,6 +58,7 @@ export type SEO = {
   title: string;
   description: string;
 };
+
 export type ShopifyProduct = {
   id: string;
   handle: string;
@@ -154,6 +155,9 @@ export type CartItem = {
     }[];
     product: CartProduct;
   };
+  bookingDate?: Date | null;
+  // New field to capture booking type (e.g. "service" or "event rental")
+  bookingType?: string | null;
 };
 
 export type ShopifyCart = {
@@ -224,6 +228,9 @@ export type ShopifyAddToCartOperation = {
     lines: {
       merchandiseId: string;
       quantity: number;
+      bookingDate?: string | null;
+      // New: include bookingType for add-to-cart operation
+      bookingType?: string | null;
     }[];
   };
 };
