@@ -1,10 +1,13 @@
 "use client";
 /* eslint-disable react-hooks/exhaustive-deps */
+
 import { Cart, CartItem, Product, ProductVariant } from "@/lib/shopify/types";
 import { createContext, use, useContext, useMemo, useOptimistic } from "react";
 
+// Define the types of updates that can be applied to a cart item.
 type UpdateType = "plus" | "minus" | "delete";
 
+// Define the shape of the Cart context.
 type CartContextType = {
   cart: Cart | undefined;
   updateCartItem: (merchandiseId: string, updateType: UpdateType) => void;
@@ -16,6 +19,7 @@ type CartContextType = {
   ) => void;
 };
 
+// Define actions for our cart reducer.
 type CartAction =
     | {
   type: "UPDATE_ITEM";
@@ -31,8 +35,10 @@ type CartAction =
   };
 };
 
+// Create the Cart context.
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Returns an empty cart object.
 function createEmptyCart(): Cart {
   return {
     id: undefined,
@@ -47,10 +53,13 @@ function createEmptyCart(): Cart {
   };
 }
 
+// Helper function to calculate the cost for a given quantity and unit price.
 function calculateItemCost(quantity: number, price: string): string {
   return (Number(price) * quantity).toString();
 }
 
+// Updates a cart item based on the update type.
+// Returns the updated item or null if the item should be removed.
 function updateCartItem(
     item: CartItem,
     updateType: UpdateType
@@ -62,12 +71,10 @@ function updateCartItem(
 
   if (newQuantity === 0) return null;
 
-  const singleItemAmount =
-      Number(item.cost.totalAmount.amount) / item.quantity;
-  const newTotalAmount = calculateItemCost(
-      newQuantity,
-      singleItemAmount.toString()
-  );
+  // Calculate the cost per single unit.
+  const singleItemAmount = Number(item.cost.totalAmount.amount) / item.quantity;
+  // Calculate new total amount based on updated quantity.
+  const newTotalAmount = calculateItemCost(newQuantity, singleItemAmount.toString());
 
   return {
     ...item,
@@ -79,12 +86,13 @@ function updateCartItem(
         amount: newTotalAmount,
       },
     },
-    // Preserve the existing bookingDate and bookingType when updating an item
+    // Preserve existing booking information if available.
     bookingDate: (item as any).bookingDate ?? null,
     bookingType: (item as any).bookingType ?? null,
   };
 }
 
+// Updates the overall cart totals based on the provided cart items.
 function updateCartTotals(
     lines: CartItem[]
 ): Pick<Cart, "totalQuantity" | "cost"> {
@@ -94,6 +102,7 @@ function updateCartTotals(
       0
   );
 
+  // Use the currency code from the first item, or default to "USD".
   const currencyCode = lines[0]?.cost.totalAmount.currencyCode ?? "USD";
 
   return {
@@ -106,6 +115,7 @@ function updateCartTotals(
   };
 }
 
+// Creates or updates a cart item based on whether it already exists.
 function createOrUpdateCartItem(
     existingItem: CartItem | undefined,
     variant: ProductVariant,
@@ -136,8 +146,7 @@ function createOrUpdateCartItem(
         featuredImage: product.featuredImage,
       },
     },
-    // Set the bookingDate and bookingType if provided;
-    // if updating, preserve the existing values.
+    // Use provided booking details or preserve existing ones.
     bookingDate:
         bookingDate || (existingItem && (existingItem as any).bookingDate) || null,
     bookingType:
@@ -145,12 +154,14 @@ function createOrUpdateCartItem(
   };
 }
 
+// Reducer to update the cart state based on actions.
 function cartReducer(state: Cart | undefined, action: CartAction): Cart {
   const currentCart = state || createEmptyCart();
 
   switch (action.type) {
     case "UPDATE_ITEM": {
       const { merchandiseId, updateType } = action.payload;
+      // Update matching cart items and filter out any that return null.
       const updatedLines = currentCart.lines
           .map((item) =>
               item.merchandise.id === merchandiseId
@@ -159,6 +170,7 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
           )
           .filter(Boolean) as CartItem[];
 
+      // If no items remain, reset totals.
       if (updatedLines.length === 0) {
         return {
           ...currentCart,
@@ -182,6 +194,7 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
       const existingItem = currentCart.lines.find(
           (item) => item.merchandise.id === variant.id
       );
+      // Create a new or updated cart item.
       const updatedItem = createOrUpdateCartItem(
           existingItem,
           variant,
@@ -207,6 +220,7 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
   }
 }
 
+// CartProvider component that wraps children with the Cart context.
 export function CartProvider({
                                children,
                                cartPromise,
@@ -214,12 +228,15 @@ export function CartProvider({
   children: React.ReactNode;
   cartPromise: Promise<Cart | undefined>;
 }) {
+  // Resolve the initial cart from the provided promise.
   const initialCart = use(cartPromise);
+  // Set up optimistic updates using the cart reducer.
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
       initialCart,
       cartReducer
   );
 
+  // Function to update a cart item (e.g., increment, decrement, or delete).
   const updateCartItem = (merchandiseId: string, updateType: UpdateType) => {
     updateOptimisticCart({
       type: "UPDATE_ITEM",
@@ -227,6 +244,7 @@ export function CartProvider({
     });
   };
 
+  // Function to add an item to the cart.
   const addCartItem = (
       variant: ProductVariant,
       product: Product,
@@ -239,6 +257,7 @@ export function CartProvider({
     });
   };
 
+  // Memoize the context value to avoid unnecessary re-renders.
   const value = useMemo(
       () => ({
         cart: optimisticCart,
@@ -251,6 +270,7 @@ export function CartProvider({
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+// Custom hook to access the Cart context.
 export function useCart() {
   const context = useContext(CartContext);
 

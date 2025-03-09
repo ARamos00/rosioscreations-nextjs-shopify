@@ -12,7 +12,7 @@ import { Suspense } from "react";
 import BookableIndicator from "@/components/product/bookable-indicator";
 import BookingCalendar from "@/components/calendar/BookingCalendar";
 import { BookingDateProvider } from "@/components/calendar/bookingDateContext";
-import { ExtendedProduct } from "@/lib/shopify/extendedTypes"; // NEW: extended type import
+import { ExtendedProduct } from "@/lib/shopify/extendedTypes"; // extended type import
 
 /**
  * generateMetadata
@@ -87,9 +87,9 @@ export default async function ProductPage({
     return (
         <ProductProvider>
             <BookingDateProvider>
-                <div className="mx-auto max-w-screen-2xl px-4">
+                <div className="mx-auto max-w-screen-2xl px-4 py-8">
                     {/* Main product details container */}
-                    <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 md:p-12 lg:flex-row lg:gap-8 dark:border-neutral-800 dark:bg-black">
+                    <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 md:p-12 shadow-md lg:flex-row lg:gap-8 dark:border-neutral-800 dark:bg-black">
                         {/* Left Section: Product Image Gallery */}
                         <div className="h-full w-full basis-full lg:basis-4/6">
                             <Suspense
@@ -113,12 +113,13 @@ export default async function ProductPage({
                         <div className="basis-full lg:basis-2/6">
                             <Suspense fallback={null}>
                                 <ProductDescription product={product} />
-                                {/*<BookableIndicator product={extendedProduct} />*/}
+                                {/* Uncomment below if you want to show the BookableIndicator */}
+                                {/* <BookableIndicator product={extendedProduct} /> */}
                             </Suspense>
                         </div>
                     </div>
                     {/* Render the related products section below the main product details */}
-                    <RelatedPRoducts id={product.id} />
+                    <RelatedProducts id={product.id} />
                 </div>
             </BookingDateProvider>
         </ProductProvider>
@@ -126,12 +127,12 @@ export default async function ProductPage({
 }
 
 /**
- * RelatedPRoducts Component
+ * RelatedProducts Component
  *
  * This component fetches and renders a list of related products based on the current product's ID.
  * If related products are available, it displays each in a horizontal scrollable list.
  */
-async function RelatedPRoducts({ id }: { id: string }) {
+async function RelatedProducts({ id }: { id: string }) {
     const relatedProducts = await getProductRecommendations(id);
     if (!relatedProducts) return null;
 
@@ -144,11 +145,7 @@ async function RelatedPRoducts({ id }: { id: string }) {
                         key={product.handle}
                         className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
                     >
-                        <Link
-                            className="relative h-full w-full"
-                            href={`/product/${product.handle}`}
-                            prefetch={true}
-                        >
+                        <Link className="relative h-full w-full" href={`/product/${product.handle}`} prefetch={true}>
                             <GridTileImage
                                 alt={product.title}
                                 label={{

@@ -1,18 +1,19 @@
 "use client";
 
-import { Product, ProductVariant } from "@/lib/shopify/types";
-import { useProduct } from "../product/product-context";
-import { useCart } from "./cart-context";
-import { useBookingDate } from "@/components/calendar/bookingDateContext";
-import { useFormState } from "react-dom";
-import clsx from "clsx";
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { addItem } from "./actions";
+import { Product, ProductVariant } from "@/lib/shopify/types"; // Import product types
+import { useProduct } from "../product/product-context"; // Hook for product context
+import { useCart } from "./cart-context"; // Hook for cart context
+import { useBookingDate } from "@/components/calendar/bookingDateContext"; // Hook for booking date context
+import { useFormState } from "react-dom"; // Hook for handling form state and server actions
+import clsx from "clsx"; // Utility for conditionally joining classNames
+import { PlusIcon } from "@heroicons/react/24/outline"; // Icon component
+import { addItem } from "./actions"; // Server action to add an item to the cart
 
-// We assume ExtendedProduct extends Product and includes metafields
-// such as eventOrServiceChoice.
+// ExtendedProduct extends Product with additional metafields (e.g., eventOrServiceChoice)
 import { ExtendedProduct } from "@/lib/shopify/extendedTypes";
 
+// SubmitButton Component
+// Renders a button with different states based on product availability and selection.
 function SubmitButton({
                           availableForSale,
                           selectedVariantId,
@@ -20,10 +21,13 @@ function SubmitButton({
     availableForSale: boolean;
     selectedVariantId: string | undefined;
 }) {
+    // Define base button classes with a Warm Peach accent (#EFAA9F)
     const buttonClasses =
-        "relative flex w-full items-center justify-center rounded-full bg-blue-600 p-4 tracking-wide text-white";
+        "relative flex w-full items-center justify-center rounded-full bg-[#EFAA9F] p-4 tracking-wide text-white";
+    // Classes for disabled button state
     const disabledClasses = "cursor-not-allowed opacity-60 hover:opacity-60";
 
+    // If product is out of stock, render a disabled button
     if (!availableForSale) {
         return (
             <button disabled className={clsx(buttonClasses, disabledClasses)}>
@@ -32,6 +36,7 @@ function SubmitButton({
         );
     }
 
+    // If no variant is selected, render a disabled button with an alert
     if (!selectedVariantId) {
         return (
             <button
@@ -47,10 +52,11 @@ function SubmitButton({
         );
     }
 
+    // Otherwise, render an enabled button for adding to the cart
     return (
         <button
             aria-label="Add to cart"
-            className={clsx(buttonClasses, { "hover:opacity-90": true })}
+            className={clsx(buttonClasses, "hover:opacity-90")}
         >
             <div className="absolute left-0 ml-4">
                 <PlusIcon className="h-5" />
@@ -60,42 +66,60 @@ function SubmitButton({
     );
 }
 
+// AddToCart Component
+// Handles adding a product to the cart with optional booking attributes.
 export function AddToCart({ product }: { product: Product }) {
+    // Destructure product properties: variants and sale availability
     const { variants, availableForSale } = product;
+    // Access addCartItem function from cart context for optimistic UI updates
     const { addCartItem } = useCart();
+    // Retrieve booking date from booking date context
     const { bookingDate } = useBookingDate();
+    // Access product state (selected options) from product context
     const { state } = useProduct();
+    // Set up form state with the addItem server action
     const [message, formAction] = useFormState(addItem, null);
 
+    // Determine the currently selected variant by matching selected options with product state
     const variant = variants.find((variant: ProductVariant) =>
         variant.selectedOptions.every(
             (option) => option.value === state[option.name.toLowerCase()]
         )
     );
+    // If there is only one variant, use it as the default
     const defaultVariantId = variants.length === 1 ? variants[0]?.id : undefined;
+    // Use the found variant or the default variant
     const selectedVariantId = variant?.id || defaultVariantId;
+    // Retrieve the final variant object based on the selected variant ID
     const finalVariant = variants.find(
         (variant) => variant.id === selectedVariantId
     )!;
 
-    // Cast product to ExtendedProduct so we can access additional metafields.
+    // Cast product to ExtendedProduct to access additional metafields
     const extendedProduct = product as ExtendedProduct;
+    // Retrieve bookingType from metafield; fallback to empty string if not available
     const bookingType = extendedProduct.eventOrServiceChoice?.value || "";
 
     return (
         <form
             action={async (formData: FormData) => {
-                // Extract bookingDate from hidden input:
+                // Extract bookingDate from hidden input
                 const bookingDateFromForm =
                     formData.get("bookingDate")?.toString() || undefined;
-                // Extract bookingType from hidden input:
+                // Extract bookingType from hidden input
                 const bookingTypeFromForm =
                     formData.get("bookingType")?.toString() || undefined;
-                console.log("Server action bookingDate from form:", bookingDateFromForm);
-                console.log("Server action bookingType from form:", bookingTypeFromForm);
-                // Optimistic update:
+                console.log(
+                    "Server action bookingDate from form:",
+                    bookingDateFromForm
+                );
+                console.log(
+                    "Server action bookingType from form:",
+                    bookingTypeFromForm
+                );
+                // Perform an optimistic update by adding the item to the cart immediately
                 addCartItem(finalVariant, product, bookingDate);
-                // Pass both values as a single object to the server action:
+                // Execute the server action with the selected variant and booking details
                 await formAction({
                     selectedVariantId,
                     bookingDate: bookingDateFromForm,
@@ -103,18 +127,20 @@ export function AddToCart({ product }: { product: Product }) {
                 });
             }}
         >
-            {/* Hidden input to include bookingDate in form submission */}
+            {/* Hidden input for bookingDate */}
             <input
                 type="hidden"
                 name="bookingDate"
                 value={bookingDate ? bookingDate.toISOString() : ""}
             />
-            {/* Hidden input to include bookingType in form submission */}
+            {/* Hidden input for bookingType */}
             <input type="hidden" name="bookingType" value={bookingType} />
+            {/* Render the submit button with proper states */}
             <SubmitButton
                 availableForSale={availableForSale}
                 selectedVariantId={selectedVariantId}
             />
+            {/* Screen reader message for form state updates */}
             <p className="sr-only" role="status" aria-label="polite">
                 {message}
             </p>

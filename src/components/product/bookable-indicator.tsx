@@ -1,28 +1,30 @@
 "use client";
-import React, { useEffect } from "react";
-import { ExtendedProduct } from "@/lib/shopify/extendedTypes";
+
+import React, { useEffect } from "react"; // Import React and useEffect hook
+import { ExtendedProduct } from "@/lib/shopify/extendedTypes"; // Import ExtendedProduct type
 
 interface BookableIndicatorProps {
-    product: ExtendedProduct;
+    product: ExtendedProduct; // Prop type for the product
 }
 
 const BookableIndicator: React.FC<BookableIndicatorProps> = ({ product }) => {
+    // Log metafield values for debugging when the product changes
     useEffect(() => {
         console.log("Debug - Bookable Metafield:", product.bookableMetafield);
         console.log("Debug - Event or Service Choice Metafield:", product.eventOrServiceChoice);
     }, [product]);
 
-    // Determine bookable status from the metafield value
+    // Extract and determine the bookable status from the product metafield
     const bookableField = product.bookableMetafield;
     const rawBookableValue = bookableField?.value;
     const isBookable =
         typeof rawBookableValue === "string" && rawBookableValue.toLowerCase() === "true";
 
-    // Get Event or Service Choice value
+    // Extract the event or service choice value, defaulting if not provided
     const eventOrServiceField = product.eventOrServiceChoice;
     const eventOrServiceValue = eventOrServiceField?.value || "Not specified";
 
-    // Styling for the bookable indicator circle
+    // Define inline styles for the indicator circle based on bookable status
     const indicatorStyle: React.CSSProperties = {
         width: "100px",
         height: "100px",
@@ -38,13 +40,15 @@ const BookableIndicator: React.FC<BookableIndicatorProps> = ({ product }) => {
 
     return (
         <div>
+            {/* Display the bookable status inside a styled circle */}
             <div style={indicatorStyle}>
                 {isBookable ? "Bookable" : "Not Bookable"}
             </div>
+            {/* Display the event or service choice value */}
             <div>
                 <strong>Event/Service Choice:</strong> {eventOrServiceValue}
             </div>
-            {/* Debug Information */}
+            {/* Debug information rendered as formatted JSON */}
             <pre>
         {JSON.stringify({ rawBookableValue, isBookable, eventOrServiceValue }, null, 2)}
       </pre>
