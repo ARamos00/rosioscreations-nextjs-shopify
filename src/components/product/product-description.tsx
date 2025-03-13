@@ -9,13 +9,13 @@ export function ProductDescription({ product }: { product: Product }) {
     return (
         <>
             {/* Product header with title and price */}
-            <div className="mb-6 flex flex-col border-b pb-6 dark:border-neutral-700">
+            <div className="mb-6 flex flex-col border-b pb-6 border-secondary">
                 {/* Product title */}
-                <h1 className="mb-2 text-5xl font-medium text-gray-800 dark:text-white">
+                <h1 className="mb-2 text-5xl font-medium text-secondary">
                     {product.title}
                 </h1>
                 {/* Price badge */}
-                <div className="mr-auto w-auto rounded-full bg-[#EFAA9F] p-2 text-sm text-white">
+                <div className="mr-auto w-auto rounded-full bg-secondary p-2 text-sm text-primary">
                     <Price
                         amount={product.priceRange.maxVariantPrice.amount}
                         currencyCode={product.priceRange.maxVariantPrice.currencyCode}
@@ -27,7 +27,7 @@ export function ProductDescription({ product }: { product: Product }) {
             {/* Render product description if available */}
             {product.descriptionHtml ? (
                 <Prose
-                    className="mb-6 text-sm leading-light text-gray-700 dark:text-white/[60%]"
+                    className="mb-6 text-sm leading-relaxed text-secondary"
                     html={product.descriptionHtml}
                 />
             ) : null}

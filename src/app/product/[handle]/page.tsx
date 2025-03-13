@@ -12,22 +12,16 @@ import { Suspense } from "react";
 import BookableIndicator from "@/components/product/bookable-indicator";
 import BookingCalendar from "@/components/calendar/BookingCalendar";
 import { BookingDateProvider } from "@/components/calendar/bookingDateContext";
-import { ExtendedProduct } from "@/lib/shopify/extendedTypes"; // extended type import
+import { ExtendedProduct } from "@/lib/shopify/extendedTypes";
 
 /**
  * generateMetadata
  *
- * This asynchronous function builds dynamic SEO metadata for the product page.
- * It fetches the product data using the product handle from the URL parameters.
+ * Dynamically builds SEO metadata for the product page.
  * If the product isn't found, it triggers a 404 using Next.js's notFound().
- *
- * Metadata includes:
- * - Title and description derived from SEO settings or fallback to product details.
- * - Robots directives controlling indexing based on the product tags.
- * - Open Graph image data if a featured image is available.
  */
 export async function generateMetadata({
-                                           params, // Contains the dynamic product handle from the URL
+                                           params,
                                        }: {
     params: { handle: string };
 }): Promise<Metadata> {
@@ -66,35 +60,32 @@ export async function generateMetadata({
 /**
  * ProductPage Component
  *
- * This is the main component for rendering a product page.
- * It fetches the product data, provides context to child components, and renders:
- * - A Gallery of product images (using Suspense for lazy loading).
- * - A detailed product description (also wrapped in Suspense).
- * - A Booking Calendar (wrapped in BookingDateProvider) centered below the image.
- * - A list of related products below the main content.
+ * Renders the product page with an image gallery, product description,
+ * booking calendar, and related products. The main product details container now
+ * uses a light background (bg-secondary) with dark text (text-primary) for maximum readability.
  */
 export default async function ProductPage({
-                                              params, // Contains the dynamic product handle from the URL
+                                              params,
                                           }: {
     params: { handle: string };
 }) {
     const product = await getProduct(params.handle);
     if (!product) return notFound();
 
-    // Cast product to ExtendedProduct so it includes our metafields
+    // Cast product to ExtendedProduct to include our metafields.
     const extendedProduct = product as ExtendedProduct;
 
     return (
         <ProductProvider>
             <BookingDateProvider>
                 <div className="mx-auto max-w-screen-2xl px-4 py-8">
-                    {/* Main product details container */}
-                    <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 md:p-12 shadow-md lg:flex-row lg:gap-8 dark:border-neutral-800 dark:bg-black">
+                    {/* Main product details container with light background and dark text */}
+                    <div className="flex flex-col rounded-lg border border-primary bg-secondary p-8 md:p-12 shadow-md lg:flex-row lg:gap-8 text-primary">
                         {/* Left Section: Product Image Gallery */}
                         <div className="h-full w-full basis-full lg:basis-4/6">
                             <Suspense
                                 fallback={
-                                    <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
+                                    <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden bg-secondary" />
                                 }
                             >
                                 <Gallery
@@ -104,7 +95,7 @@ export default async function ProductPage({
                                     }))}
                                 />
                             </Suspense>
-                            {/* Center the BookingCalendar below the image */}
+                            {/* Center the BookingCalendar below the image. Note: BookingCalendar already carries its own styling to stand out. */}
                             <div className="mt-16 py-16 flex justify-center">
                                 <BookingCalendar product={extendedProduct} />
                             </div>
@@ -118,7 +109,7 @@ export default async function ProductPage({
                             </Suspense>
                         </div>
                     </div>
-                    {/* Render the related products section below the main product details */}
+                    {/* Related Products Section */}
                     <RelatedProducts id={product.id} />
                 </div>
             </BookingDateProvider>
@@ -129,8 +120,7 @@ export default async function ProductPage({
 /**
  * RelatedProducts Component
  *
- * This component fetches and renders a list of related products based on the current product's ID.
- * If related products are available, it displays each in a horizontal scrollable list.
+ * Fetches and renders a list of related products based on the current product's ID.
  */
 async function RelatedProducts({ id }: { id: string }) {
     const relatedProducts = await getProductRecommendations(id);
@@ -138,14 +128,18 @@ async function RelatedProducts({ id }: { id: string }) {
 
     return (
         <div className="py-8">
-            <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
+            <h2 className="mb-4 text-2xl font-bold text-primary">Related Products</h2>
             <ul className="flex w-full gap-4 overflow-x-auto pt-1">
                 {relatedProducts.map((product) => (
                     <li
                         key={product.handle}
                         className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
                     >
-                        <Link className="relative h-full w-full" href={`/product/${product.handle}`} prefetch={true}>
+                        <Link
+                            className="relative h-full w-full"
+                            href={`/product/${product.handle}`}
+                            prefetch={true}
+                        >
                             <GridTileImage
                                 alt={product.title}
                                 label={{

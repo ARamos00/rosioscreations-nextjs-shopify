@@ -1,7 +1,6 @@
 const plugin = require("tailwindcss/plugin");
 
 /** @type {import('tailwindcss').config} */
-
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,12 +12,16 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
       },
+      colors: {
+        // Primary: Darker color used for text and primary elements
+        primary: "#3B3834", // hsl(34, 6%, 21%) | rgb(59, 56, 52)
+        // Secondary: Lighter color used for backgrounds and secondary elements
+        secondary: "#F8E1D9", // hsl(15, 68%, 91%) | rgb(248, 225, 217)
+      },
       keyframes: {
         fadeIn: {
           from: { opacity: 0 },
-          to: {
-            opacity: 1,
-          },
+          to: { opacity: 1 },
         },
       },
       blink: {
@@ -40,16 +43,12 @@ module.exports = {
     require("@tailwindcss/container-queries"),
     plugin(({ matchUtilities, theme }) => {
       matchUtilities(
-        {
-          "animation-delay": (value) => {
-            return {
+          {
+            "animation-delay": (value) => ({
               "animation-delay": value,
-            };
+            }),
           },
-        },
-        {
-          values: theme("transitionDelay"),
-        }
+          { values: theme("transitionDelay") }
       );
     }),
   ],

@@ -41,7 +41,7 @@ const DualCalendar: React.FC = () => {
 
     // Render a loading message if data is still being fetched.
     if (loading) {
-        return <div className="text-center p-4">Loading calendars...</div>;
+        return <div className="text-center p-4 text-secondary">Loading calendars...</div>;
     }
 
     // Render an error message if an error occurred during data fetching.
@@ -53,15 +53,15 @@ const DualCalendar: React.FC = () => {
     return (
         <div className="flex flex-col md:flex-row gap-8">
             {/* Service Calendar Section */}
-            <div className="flex-1 bg-[#F8E1D9] p-6 rounded-lg shadow-lg flex flex-col items-center">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Service Calendar</h2>
+            <div className="flex-1 bg-primary p-6 rounded-lg shadow-lg flex flex-col items-center">
+                <h2 className="text-xl font-semibold mb-4 text-secondary">Service Calendar</h2>
                 <div className="w-full flex justify-center">
                     <CalendarView bookedDates={serviceBookedDates} interactive={false} />
                 </div>
             </div>
             {/* Event Rental Calendar Section */}
-            <div className="flex-1 bg-[#F8E1D9] p-6 rounded-lg shadow-lg flex flex-col items-center">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Event Rental Calendar</h2>
+            <div className="flex-1 bg-primary p-6 rounded-lg shadow-lg flex flex-col items-center">
+                <h2 className="text-xl font-semibold mb-4 text-secondary">Event Rental Calendar</h2>
                 <div className="w-full flex justify-center">
                     <CalendarView bookedDates={eventBookedDates} interactive={false} />
                 </div>
