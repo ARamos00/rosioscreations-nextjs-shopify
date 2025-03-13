@@ -10,11 +10,11 @@ export function ProductDescription({ product }: { product: Product }) {
         <>
             {/* Product header with title and price */}
             <div className="mb-6 flex flex-col border-b pb-6 border-secondary">
-                {/* Product title */}
-                <h1 className="mb-2 text-5xl font-medium text-secondary">
+                {/* Product title updated to use text-primary (dark) for better contrast */}
+                <h1 className="mb-2 text-5xl font-medium text-primary">
                     {product.title}
                 </h1>
-                {/* Price badge */}
+                {/* Price badge remains the same, as its bg-secondary (light) and text-primary (dark) create strong contrast */}
                 <div className="mr-auto w-auto rounded-full bg-secondary p-2 text-sm text-primary">
                     <Price
                         amount={product.priceRange.maxVariantPrice.amount}
@@ -24,10 +24,10 @@ export function ProductDescription({ product }: { product: Product }) {
             </div>
             {/* Variant selector for product options */}
             <VariantSelector options={product.options} variants={product.variants} />
-            {/* Render product description if available */}
+            {/* Render product description if available, updating text to primary for optimal contrast */}
             {product.descriptionHtml ? (
                 <Prose
-                    className="mb-6 text-sm leading-relaxed text-secondary"
+                    className="mb-6 text-sm leading-relaxed text-primary"
                     html={product.descriptionHtml}
                 />
             ) : null}

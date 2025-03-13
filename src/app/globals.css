@@ -25,13 +25,28 @@ button {
   text-align: center;
 }
 
+/* Ensure all text inside the booking calendar uses the primary dark color */
+.booking-calendar,
+.booking-calendar * {
+  color: #3B3834 !important;
+}
+
 /* Base Calendar Style */
 .booking-calendar .react-calendar {
   border: 1px solid #D8D8D8; /* Muted Gray */
   border-radius: 8px;
   padding: 10px;
-  background-color: #F8E1D9; /* Creamy Beige */
+  background-color: #F8E1D9; /* Creamy Beige (Secondary) */
   transition: box-shadow 0.3s ease;
+}
+
+/* Navigation and header text styling for react-calendar */
+.booking-calendar .react-calendar__navigation button {
+  color: #3B3834;
+}
+.booking-calendar .react-calendar__navigation button:enabled:hover,
+.booking-calendar .react-calendar__navigation button:enabled:focus {
+  background-color: transparent;
 }
 
 /* Hover over entire calendar to add a subtle shadow */
@@ -43,7 +58,7 @@ button {
 .booking-calendar p {
   margin-top: 10px;
   font-size: 1rem;
-  color: #333;
+  color: #3B3834;
 }
 
 /* Calendar tile hover effects */
@@ -54,11 +69,10 @@ button {
 
 /* Hover state for calendar tiles */
 .react-calendar__tile:hover {
-  /* Overlay a soft gradient: blending Blush Pink and Warm Peach with a touch of opacity */
   background: linear-gradient(
           135deg,
-          rgba(254, 232, 224, 0.7),
-          rgba(239, 170, 159, 0.7)
+          rgba(59, 56, 52, 0.2),
+          rgba(59, 56, 52, 0.2)
   ) !important;
   transform: scale(1.03);
 }
@@ -66,7 +80,7 @@ button {
 /* Booked dates - keep the look consistent */
 .react-calendar__tile.booked {
   background-color: #D8D8D8 !important; /* Muted Gray for booked dates */
-  color: #888;
+  color: #888 !important;
 }
 
 
@@ -90,6 +104,7 @@ body {
 .group:hover .pattern-overlay {
   opacity: 1;
 }
+
 
 
 
