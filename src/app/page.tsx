@@ -35,10 +35,12 @@ export default function Home() {
             {/* Content Container */}
             <div className="relative z-10 px-4 md:px-6 text-center space-y-6 h-full flex flex-col justify-center">
               <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem] text-secondary">
-                Hello, <span className="font-bold">I&apos;m Maria Ramos</span>, the owner and decorator of <span className="font-bold">Rosio&rsquo;s Creations</span>.
+                Hello, <span className="font-bold">I&apos;m Maria Ramos</span>, the owner and decorator of <span
+                  className="font-bold">Rosio&rsquo;s Creations</span>.
               </h1>
               <p className="mx-auto max-w-[700px] md:text-xl text-secondary">
-                An event decorator dedicated to transforming spaces into unforgettable and magical experiences. Let us make your event exceptional.
+                An event decorator dedicated to transforming spaces into unforgettable and magical experiences. Let us
+                make your event exceptional.
               </p>
               <div className="flex flex-col w-full md:flex-row gap-2 text-nowrap justify-center">
                 <Link
@@ -70,7 +72,7 @@ export default function Home() {
             <h2 className="text-center text-3xl font-bold mb-8 text-secondary">
               Booking Dates
             </h2>
-            <DualCalendar />
+            <DualCalendar/>
           </div>
         </section>
 
@@ -90,7 +92,8 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid items-start justify-center gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-4">
+            <div
+                className="mx-auto grid items-start justify-center gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-4">
               {[
                 {
                   href: "/search/services-collection-event-decor-and-design",
@@ -124,13 +127,16 @@ export default function Home() {
                           width={400}
                           height={500}
                           alt={collection.alt}
-                          className="aspect-[4/5] object-cover transition-transform duration-300 group-hover:scale-105 group-hover:opacity-70"
+                          className="aspect-[4/5] object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      {/* Dark overlay to dim the image */}
-                      <div className="absolute inset-0 bg-black bg-opacity-30 transition-opacity duration-300"></div>
-                      {/* Pattern overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center pattern-overlay transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                        <h3 className="text-secondary text-lg font-bold transition-all duration-300 group-hover:text-primary">
+                      {/* Dark overlay with subtle hover effect */}
+                      <div
+                          className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-opacity duration-300"></div>
+
+                      {/* Pattern overlay with explicit background for contrast */}
+                      <div
+                          className="absolute inset-0 flex items-center justify-center pattern-overlay bg-secondary bg-opacity-75 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 className="text-primary text-lg font-bold">
                           {collection.title}
                         </h3>
                       </div>
