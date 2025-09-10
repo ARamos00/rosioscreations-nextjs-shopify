@@ -1,38 +1,70 @@
-[![Building Next.js Ecommerce Store with TypeScript, Tailwindcss, headlessui, and Shopify CMS.](https://img.youtube.com/vi/fJxzVFXGT_E/0.jpg)](https://www.youtube.com/watch?v=fJxzVFXGT_E)
+# Rosio’s Creations — Next.js + Shopify + Supabase Bookings
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+I forked a Next.js + Shopify starter and added a **booking flow**. Products can be **Services** or **Rentals**, each with its **own calendar**. When a user picks a date, that selection rides through Shopify checkout and lands in **Supabase** on order creation (and is cleaned up on cancellation).
 
-## Getting Started
+## What’s here
 
-First, run the development server:
+* **Separate calendars** for Services and Rentals.
+* **Calendar on product pages** to choose date(s).
+* **Cart updated** to carry booking data (line item/cart metadata).
+* **Order create route** → inserts a booking row in Supabase.
+* **Order cancel route** → releases/updates the booking row.
+* **Event décor page/route** as a booking entry point.
+* Tech: **Next.js (App Router), TS, Tailwind, Shopify Storefront API, Supabase**.
+
+## How it works
+
+1. User opens a Service or Rental product and picks a date on the **Calendar**.
+2. The booking payload is attached to the cart item and survives checkout.
+3. On **order creation**, my route writes the booking to **Supabase**.
+4. On **order cancellation**, my route updates or frees that booking.
+
+## Setup
+
+```bash
+npm install
+cp .env.sample .env   # fill these
+npm run dev           # http://localhost:3000
+```
+
+### Env (minimal)
+
+* `SHOPIFY_STORE_DOMAIN`
+* `SHOPIFY_STOREFRONT_ACCESS_TOKEN`
+* `SUPABASE_URL`
+* `SUPABASE_SERVICE_ROLE_KEY` (server-only)
+
+## Key pieces I added
+
+* **Calendar component** (renders the right calendar by type, validates date).
+* **Cart changes** (serialize/deserialize booking data reliably).
+* **Routes**
+
+  * **Order creation** route: validate → insert booking in Supabase.
+  * **Order cancellation** route: validate → release/update booking.
+* **Event décor** page + route for service booking.
+
+## Notes
+
+* Dates are stored in **UTC**; convert for display at the edges.
+* Keep `SUPABASE_SERVICE_ROLE_KEY` **server-side only**.
+* Shopify remains source of truth for orders; **Supabase** is source of truth for **bookings**.
+
+## Scripts
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Starter/refs
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* Video the starter came from:
+  [![Building Next.js Ecommerce Store](https://img.youtube.com/vi/fJxzVFXGT_E/0.jpg)](https://www.youtube.com/watch?v=fJxzVFXGT_E)
+* Next.js docs: [https://nextjs.org/docs](https://nextjs.org/docs)
+* Shopify Storefront API: [https://shopify.dev/docs/api/storefront](https://shopify.dev/docs/api/storefront)
+* Supabase: [https://supabase.com/docs](https://supabase.com/docs)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+---
